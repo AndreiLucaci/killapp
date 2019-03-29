@@ -7,7 +7,7 @@
         mc:Ignorable = "d" d:DesignHeight = "300" d:DesignWidth = "300"
 		xmlns:viewModel="clr-namespace:KillApp.ViewModels"
 		DataContext="{StaticResource MainViewModel}"
-		Title="MainWindow" Height="450" Width="800">
+		Title="KillApp" Height="450" Width="800">
 	<Grid>
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="*"></ColumnDefinition>
@@ -17,14 +17,13 @@
 		<ListView ItemsSource="{Binding Path=Processes, Mode=TwoWay}"
 		          IsSynchronizedWithCurrentItem="True"
 				  Grid.Column="0"
-				  SelectedItem="{Binding SelectedProcess}"
+				  SelectedItem="{Binding SelectedProcess, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
 				  Name="ListView">
 			<ListView.View>
 				<GridView AllowsColumnReorder="False" ColumnHeaderToolTip="Processes">
 					<GridViewColumn Header="Id" Width="50" DisplayMemberBinding="{Binding Path=Id}" />
 					<GridViewColumn Header="Name" Width="300" DisplayMemberBinding="{Binding Path=ProcessName}" />
 					<GridViewColumn Header="Start time" Width="200" DisplayMemberBinding="{Binding Path=StartTime}" />
-					<GridViewColumn Header="Affinity" Width="20" DisplayMemberBinding="{Binding Path=ProcessorAffinity}" />
 				</GridView>
 			</ListView.View>
 		</ListView>
@@ -33,10 +32,16 @@
 				<RowDefinition Height="50"></RowDefinition>
 				<RowDefinition Height="50"></RowDefinition>
 				<RowDefinition Height="50"></RowDefinition>
+				<RowDefinition Height="50"></RowDefinition>
 			</Grid.RowDefinitions>
-			<Button Command="{Binding RowClick }" Grid.Row="0">Kill</Button>
-			<Button Command="{Binding Refresh }" Grid.Row="1">Refresh</Button>
-			<TextBox IsReadOnly="True" Text="{Binding NumberOfProcesses}" Grid.Row="2"></TextBox>
+			<CheckBox Grid.Row="0" IsChecked="{Binding IsSingleProcess}">
+				<TextBlock>
+					Single process
+				</TextBlock>
+			</CheckBox>
+			<Button Command="{Binding RowClick }" Grid.Row="1">Kill</Button>
+			<Button Command="{Binding Refresh }" Grid.Row="2">Refresh</Button>
+			<TextBox IsReadOnly="True" Text="{Binding NumberOfProcesses}" Grid.Row="3"></TextBox>
 		</Grid>
 	</Grid>
 </Window>
