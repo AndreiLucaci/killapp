@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.2003
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KillApp", "KillApp.csproj", "{F34BDC76-41A5-4043-8992-9360790A6525}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F34BDC76-41A5-4043-8992-9360790A6525}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F34BDC76-41A5-4043-8992-9360790A6525}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F34BDC76-41A5-4043-8992-9360790A6525}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F34BDC76-41A5-4043-8992-9360790A6525}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8A438793-E81B-48F8-BC58-395E45E8A210}
+	EndGlobalSection
+EndGlobal

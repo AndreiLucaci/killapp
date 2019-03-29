@@ -1,0 +1,42 @@
+﻿<Window x:Class="KillApp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:KillApp"
+        mc:Ignorable = "d" d:DesignHeight = "300" d:DesignWidth = "300"
+		xmlns:viewModel="clr-namespace:KillApp.ViewModels"
+		DataContext="{StaticResource MainViewModel}"
+		Title="MainWindow" Height="450" Width="800">
+	<Grid>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="*"></ColumnDefinition>
+			<ColumnDefinition Width="100"></ColumnDefinition>
+		</Grid.ColumnDefinitions>
+
+		<ListView ItemsSource="{Binding Path=Processes, Mode=TwoWay}"
+		          IsSynchronizedWithCurrentItem="True"
+				  Grid.Column="0"
+				  SelectedItem="{Binding SelectedProcess}"
+				  Name="ListView">
+			<ListView.View>
+				<GridView AllowsColumnReorder="False" ColumnHeaderToolTip="Processes">
+					<GridViewColumn Header="Id" Width="50" DisplayMemberBinding="{Binding Path=Id}" />
+					<GridViewColumn Header="Name" Width="300" DisplayMemberBinding="{Binding Path=ProcessName}" />
+					<GridViewColumn Header="Start time" Width="200" DisplayMemberBinding="{Binding Path=StartTime}" />
+					<GridViewColumn Header="Affinity" Width="20" DisplayMemberBinding="{Binding Path=ProcessorAffinity}" />
+				</GridView>
+			</ListView.View>
+		</ListView>
+		<Grid Grid.Column="1">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="50"></RowDefinition>
+				<RowDefinition Height="50"></RowDefinition>
+				<RowDefinition Height="50"></RowDefinition>
+			</Grid.RowDefinitions>
+			<Button Command="{Binding RowClick }" Grid.Row="0">Kill</Button>
+			<Button Command="{Binding Refresh }" Grid.Row="1">Refresh</Button>
+			<TextBox IsReadOnly="True" Text="{Binding NumberOfProcesses}" Grid.Row="2"></TextBox>
+		</Grid>
+	</Grid>
+</Window>
