@@ -4,44 +4,68 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:KillApp"
-        mc:Ignorable = "d" d:DesignHeight = "300" d:DesignWidth = "300"
-		xmlns:viewModel="clr-namespace:KillApp.ViewModels"
-		DataContext="{StaticResource MainViewModel}"
-		Title="KillApp" Height="450" Width="800">
-	<Grid>
-		<Grid.ColumnDefinitions>
-			<ColumnDefinition Width="*"></ColumnDefinition>
-			<ColumnDefinition Width="100"></ColumnDefinition>
-		</Grid.ColumnDefinitions>
+        xmlns:converters="clr-namespace:KillApp.Converters"
+        mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="1000"
+        xmlns:viewModel="clr-namespace:KillApp.ViewModels" d:DataContext="{d:DesignInstance Type=viewModel:MainWindowViewModel}"
+        DataContext="{StaticResource MainViewModel}"
+        Title="KillApp" Height="450" Width="1000">
+    <Window.Resources>
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </Window.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="150"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
 
-		<ListView ItemsSource="{Binding Path=Processes, Mode=TwoWay}"
-		          IsSynchronizedWithCurrentItem="True"
-				  Grid.Column="0"
-				  SelectedItem="{Binding SelectedProcess, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-				  Name="ListView">
-			<ListView.View>
-				<GridView AllowsColumnReorder="False" ColumnHeaderToolTip="Processes">
-					<GridViewColumn Header="Id" Width="50" DisplayMemberBinding="{Binding Path=Id}" />
-					<GridViewColumn Header="Name" Width="300" DisplayMemberBinding="{Binding Path=ProcessName}" />
-					<GridViewColumn Header="Start time" Width="200" DisplayMemberBinding="{Binding Path=StartTime}" />
-				</GridView>
-			</ListView.View>
-		</ListView>
-		<Grid Grid.Column="1">
-			<Grid.RowDefinitions>
-				<RowDefinition Height="50"></RowDefinition>
-				<RowDefinition Height="50"></RowDefinition>
-				<RowDefinition Height="50"></RowDefinition>
-				<RowDefinition Height="50"></RowDefinition>
-			</Grid.RowDefinitions>
-			<CheckBox Grid.Row="0" IsChecked="{Binding IsSingleProcess}">
-				<TextBlock>
-					Single process
-				</TextBlock>
-			</CheckBox>
-			<Button Command="{Binding RowClick }" Grid.Row="1">Kill</Button>
-			<Button Command="{Binding Refresh }" Grid.Row="2">Refresh</Button>
-			<TextBox IsReadOnly="True" Text="{Binding NumberOfProcesses}" Grid.Row="3"></TextBox>
-		</Grid>
-	</Grid>
+        <ListView ItemsSource="{Binding Path=Processes, Mode=TwoWay}"
+                  IsSynchronizedWithCurrentItem="True"
+                  Grid.Column="0"
+                  SelectedItem="{Binding SelectedProcess, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                  Name="ListView">
+            <ListView.View>
+                <GridView AllowsColumnReorder="False" ColumnHeaderToolTip="Processes">
+                    <GridViewColumn Header="Id" Width="50" DisplayMemberBinding="{Binding Path=Id}" />
+                    <GridViewColumn Header="Name" Width="300" DisplayMemberBinding="{Binding Path=ProcessName}" />
+                    <GridViewColumn Header="Start time" Width="200" DisplayMemberBinding="{Binding Path=StartTime}" />
+                    <GridViewColumn Header="Total time" Width="200" DisplayMemberBinding="{Binding Path=TotalProcessorTime}" />
+                    <GridViewColumn Header="Memory" Width="100" DisplayMemberBinding="{Binding Path=PrivateMemorySize64}" />
+                    <GridViewColumn Header="Threads" Width="100" DisplayMemberBinding="{Binding Path=Threads.Count}" />
+                </GridView>
+            </ListView.View>
+        </ListView>
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50"></RowDefinition>
+                <RowDefinition Height="50"></RowDefinition>
+                <RowDefinition Height="50"></RowDefinition>
+                <RowDefinition Height="50"></RowDefinition>
+                <RowDefinition Height="50"></RowDefinition>
+                <RowDefinition Height="100"></RowDefinition>
+            </Grid.RowDefinitions>
+            <CheckBox Grid.Row="0" IsChecked="{Binding IsSingleProcess}">
+                <TextBlock>
+                    Single process
+                </TextBlock>
+            </CheckBox>
+            <CheckBox Grid.Row="1" IsChecked="{Binding AutoRefresh}">
+                <TextBlock>
+                    Auto refresh
+                </TextBlock>
+            </CheckBox>
+            <Button Command="{Binding RowClick}" Grid.Row="2">Kill</Button>
+            <Button Command="{Binding Refresh}" Grid.Row="3">Refresh</Button>
+            <Label Content="{Binding NumberOfProcesses}" Grid.Row="4"></Label>
+            <Grid Grid.Row="5">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                </Grid.RowDefinitions>
+                <Label Content="{Binding CurrentSystemTime}" Grid.Row="0"></Label>
+                <Label Content="{Binding CPUUsage}" Grid.Row="1"></Label>
+                <Label Content="{Binding MemoryUsage}" Grid.Row="2"></Label>
+            </Grid>
+        </Grid>
+    </Grid>
 </Window>

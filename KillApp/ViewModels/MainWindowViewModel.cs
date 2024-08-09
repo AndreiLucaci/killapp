@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Threading;
 using KillApp.Annotations;
 
 namespace KillApp.ViewModels
@@ -19,6 +20,11 @@ namespace KillApp.ViewModels
         private int _numberOfProcesses;
         private Process _selectedProcess;
         private bool _isSingleProcess;
+        private DispatcherTimer _autoRefreshTimer;
+        private DispatcherTimer _atSecondUpdateTimer;
+        private DispatcherTimer _systemInfoTimer;
+        private PerformanceCounter _cpuCounter;
+        private PerformanceCounter _ramCounter;
 
         public ObservableCollection<Process> Processes
         {
@@ -44,14 +50,9 @@ namespace KillApp.ViewModels
             }
         }
 
-        public int NumberOfProcesses
+        public string NumberOfProcesses
         {
-            get => _numberOfProcesses;
-            set
-            {
-                _numberOfProcesses = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(NumberOfProcesses)));
-            }
+            get => $"Number of processes: {_numberOfProcesses}";
         }
 
         public bool IsSingleProcess
@@ -64,6 +65,28 @@ namespace KillApp.ViewModels
             }
         }
 
+        public bool AutoRefresh
+        {
+            get => _autoRefreshTimer.IsEnabled;
+            set
+            {
+                if (value)
+                {
+                    StartAutoRefreshBackgroundProcess();
+                }
+                else
+                {
+                    StopAutoRefresh();
+                }
+
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AutoRefresh)));
+            }
+        }
+
+        public string CurrentSystemTime => $"System time: {DateTime.Now.ToString("HH:mm:ss")}";
+        public string CPUUsage => $"CPU Usage: {_cpuCounter.NextValue()}%";
+        public string MemoryUsage => $"Memory Usage: {_ramCounter.NextValue()}MB";
+
         #endregion
 
         #region CTOR
@@ -75,6 +98,12 @@ namespace KillApp.ViewModels
 
             LoadProcesses();
 
+            InitializeAutoRefreshTimer();
+            InitializeAtSecondTimer();
+            InitializeSystemInformation();
+
+            StartAutoRefreshBackgroundProcess();
+
             //new System.Timers.Timer
             //{
             //    Interval = 5000,
@@ -83,6 +112,82 @@ namespace KillApp.ViewModels
             //}.Elapsed += (a, b) => LoadProcesses();
         }
         #endregion
+
+        private void InitializeAutoRefreshTimer()
+        {
+            if (_autoRefreshTimer == null)
+            {
+                _autoRefreshTimer = new DispatcherTimer
+                {
+                    Interval = TimeSpan.FromSeconds(1),
+                };
+
+                _autoRefreshTimer.Tick += (sender, args) =>
+                {
+                    LoadProcesses();
+                };
+            }
+        }
+
+        private void InitializeSystemInformation()
+        {
+            _cpuCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
+            _ramCounter = new PerformanceCounter("Memory", "Available MBytes");
+
+            if (_systemInfoTimer == null)
+            {
+                _systemInfoTimer = new DispatcherTimer
+                {
+                    Interval = TimeSpan.FromSeconds(2)
+                };
+
+                _systemInfoTimer.Tick += (sender, args) =>
+                {
+                    OnPropertyChanged(nameof(CPUUsage));
+                    OnPropertyChanged(nameof(MemoryUsage));
+                };
+            }
+
+            _systemInfoTimer.Start();
+        }
+
+        private void InitializeAtSecondTimer()
+        {
+            if (_atSecondUpdateTimer == null)
+            {
+                _atSecondUpdateTimer = new DispatcherTimer
+                {
+                    Interval = TimeSpan.FromMilliseconds(100)
+                };
+
+                _atSecondUpdateTimer.Tick += (sender, args) =>
+                {
+                    UpdateSystemInformation();
+                };
+            }
+            _atSecondUpdateTimer.Start();
+        }
+
+        private void UpdateSystemInformation()
+        {
+            OnPropertyChanged(nameof(CurrentSystemTime));
+        }
+
+        private void StartAutoRefreshBackgroundProcess()
+        {
+            if (!_autoRefreshTimer.IsEnabled)
+            {
+                _autoRefreshTimer.Start();
+            }
+        }
+
+        private void StopAutoRefresh()
+        {
+            if (_autoRefreshTimer.IsEnabled)
+            {
+                _autoRefreshTimer.Stop();
+            }
+        }
 
 
         private void KillProcess()
@@ -118,14 +223,18 @@ namespace KillApp.ViewModels
         {
             var selectedProcess = SelectedProcess;
 
-            Processes = new ObservableCollection<Process>(Process.GetProcesses().OrderBy(x => x.ProcessName).ToList());
+            var processesFromTheSystem = Process.GetProcesses().ToList();
+            var orderedProcesses = processesFromTheSystem.OrderBy(x => x.ProcessName).ToList();
+
+            Processes = new ObservableCollection<Process>(orderedProcesses);
 
             if (selectedProcess != null)
             {
                 SelectedProcess = Processes.FirstOrDefault(x => x.Id == selectedProcess.Id);
             }
 
-            NumberOfProcesses = Processes.Count;
+            _numberOfProcesses = Processes.Count;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(NumberOfProcesses)));
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
